@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Results - Signature Fraud Detection{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Results Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-6 mb-3">
+                <i class="fas fa-chart-line me-3"></i>
+                Verification Results
+            </h1>
+            <p class="text-muted">Analysis completed at {{ result.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+
+        <!-- Main Results Card -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-microscope me-2"></i>
+                    Signature Analysis Summary
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!-- Verdict -->
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="verdict-display">
+                            {% if result.is_genuine %}
+                                <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                                <h3 class="text-success">GENUINE</h3>
+                            {% else %}
+                                <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                                <h3 class="text-danger">FORGED</h3>
+                            {% endif %}
+                            <p class="text-muted">Confidence: {{ result.get_confidence_level() }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Similarity Score -->
+                    <div class="col-md-4 text-center mb-3">
+                        <h5 class="text-muted mb-3">Similarity Score</h5>
+                        <div class="position-relative d-inline-block">
+                            <div class="circular-progress" data-percentage="{{ (result.similarity_score * 100)|round(1) }}">
+                                <svg width="120" height="120" class="circular-chart">
+                                    <circle class="circle-bg" cx="60" cy="60" r="50"></circle>
+                                    <circle class="circle" cx="60" cy="60" r="50" 
+                                            stroke-dasharray="{{ (result.similarity_score * 314.159)|round(2) }}, 314.159"></circle>
+                                </svg>
+                                <div class="percentage">{{ (result.similarity_score * 100)|round(1) }}%</div>
+                            </div>
+                        </div>
+                        <p class="text-muted mt-2">Neural Network Confidence</p>
+                    </div>
+
+                    <!-- Threshold Information -->
+                    <div class="col-md-4 text-center mb-3">
+                        <h5 class="text-muted mb-3">Detection Threshold</h5>
+                        <div class="threshold-display">
+                            <div class="h2 mb-2">{{ (result.threshold * 100)|round(0) }}%</div>
+                            <div class="progress mb-2" style="height: 10px;">
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: {{ (result.threshold * 100)|round(0) }}%"></div>
+                            </div>
+                            <p class="text-muted">Minimum for Genuine</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Metrics -->
+                <div class="row mt-4">
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <i class="fas fa-percentage text-info mb-2"></i>
+                            <div class="h4">{{ (result.similarity_score * 100)|round(2) }}%</div>
+                            <small class="text-muted">Exact Similarity</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <i class="fas fa-balance-scale text-warning mb-2"></i>
+                            <div class="h4">{{ ((result.similarity_score - result.threshold) * 100)|round(2) }}%</div>
+                            <small class="text-muted">Above Threshold</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <i class="fas fa-star text-primary mb-2"></i>
+                            <div class="h4">{{ result.get_confidence_level() }}</div>
+                            <small class="text-muted">Confidence Level</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="metric-card">
+                            <i class="fas fa-clock text-secondary mb-2"></i>
+                            <div class="h4">< 1s</div>
+                            <small class="text-muted">Processing Time</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analysis -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cogs me-2"></i>
+                    Technical Analysis Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Model Information</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-brain me-2 text-primary"></i> Siamese Neural Network</li>
+                            <li><i class="fas fa-layer-group me-2 text-info"></i> Convolutional Architecture</li>
+                            <li><i class="fas fa-image me-2 text-success"></i> 105x105 Input Resolution</li>
+                            <li><i class="fas fa-eye me-2 text-warning"></i> Grayscale Processing</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Processing Pipeline</h6>
+                        <div class="processing-steps">
+                            <div class="step completed">
+                                <i class="fas fa-upload"></i> Image Upload
+                            </div>
+                            <div class="step completed">
+                                <i class="fas fa-cog"></i> Preprocessing
+                            </div>
+                            <div class="step completed">
+                                <i class="fas fa-brain"></i> Neural Analysis
+                            </div>
+                            <div class="step completed">
+                                <i class="fas fa-chart-line"></i> Score Calculation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interpretation Guide -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-question-circle me-2"></i>
+                    How to Interpret Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Genuine Signatures ({{ (result.threshold * 100)|round(0) }}%+ similarity)
+                        </h6>
+                        <ul class="text-muted">
+                            <li>High similarity indicates likely authentic signature</li>
+                            <li>Consistent stroke patterns and pressure</li>
+                            <li>Similar timing and flow characteristics</li>
+                            <li>Natural variations within acceptable range</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            Forged Signatures (< {{ (result.threshold * 100)|round(0) }}% similarity)
+                        </h6>
+                        <ul class="text-muted">
+                            <li>Low similarity suggests potential forgery</li>
+                            <li>Inconsistent stroke patterns or pressure</li>
+                            <li>Unnatural timing or hesitation marks</li>
+                            <li>Significant deviations from genuine sample</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> This analysis provides computational assistance for signature verification. 
+                    For legal or high-stakes decisions, consider additional expert analysis and multiple signature samples.
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-plus me-2"></i>
+                Analyze Another Pair
+            </a>
+            <button class="btn btn-secondary btn-lg" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>
+                Print Results
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Animate circular progress on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const circle = document.querySelector('.circle');
+    const percentage = document.querySelector('.percentage');
+    
+    if (circle && percentage) {
+        // Animate from 0 to target percentage
+        let current = 0;
+        const target = {{ (result.similarity_score * 100)|round(1) }};
+        const increment = target / 50;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            
+            const circumference = 2 * Math.PI * 50;
+            const strokeDasharray = (current / 100) * circumference;
+            circle.style.strokeDasharray = `${strokeDasharray}, ${circumference}`;
+            percentage.textContent = current.toFixed(1) + '%';
+        }, 20);
+    }
+});
+
+// Auto-hide flash messages after 5 seconds
+setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        if (alert.querySelector('.btn-close')) {
+            alert.querySelector('.btn-close').click();
+        }
+    });
+}, 5000);
+</script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Signatures - Signature Fraud Detection{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-signature text-primary me-3"></i>
+                Signature Fraud Detection
+            </h1>
+            <p class="lead text-muted">
+                Upload two signature images to compare authenticity using advanced Siamese Neural Networks
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    Upload Signature Images
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('verify_signatures') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div class="row">
+                        <!-- Genuine Signature Upload -->
+                        <div class="col-md-6 mb-4">
+                            <label for="genuine_signature" class="form-label">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Genuine Signature
+                            </label>
+                            <div class="upload-area" id="genuineUploadArea">
+                                <input type="file" class="form-control" id="genuine_signature" name="genuine_signature" 
+                                       accept="image/*" required>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Click to upload or drag & drop</p>
+                                    <small class="text-muted">PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP (Max 5MB)</small>
+                                </div>
+                                <div class="upload-preview" style="display: none;">
+                                    <img src="" alt="Genuine signature preview" class="img-fluid rounded">
+                                    <p class="mt-2 mb-0 text-success">
+                                        <i class="fas fa-check me-1"></i>
+                                        <span class="filename">File loaded</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Test Signature Upload -->
+                        <div class="col-md-6 mb-4">
+                            <label for="test_signature" class="form-label">
+                                <i class="fas fa-question-circle text-warning me-2"></i>
+                                Test Signature
+                            </label>
+                            <div class="upload-area" id="testUploadArea">
+                                <input type="file" class="form-control" id="test_signature" name="test_signature" 
+                                       accept="image/*" required>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Click to upload or drag & drop</p>
+                                    <small class="text-muted">PNG, JPG, JPEG, GIF, BMP, TIFF, WEBP (Max 5MB)</small>
+                                </div>
+                                <div class="upload-preview" style="display: none;">
+                                    <img src="" alt="Test signature preview" class="img-fluid rounded">
+                                    <p class="mt-2 mb-0 text-warning">
+                                        <i class="fas fa-check me-1"></i>
+                                        <span class="filename">File loaded</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                            <i class="fas fa-search me-2"></i>
+                            Analyze Signatures
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Information Cards -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-brain fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">AI-Powered</h5>
+                        <p class="card-text text-muted">
+                            Uses advanced Siamese Neural Networks for accurate signature comparison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p class="card-text text-muted">
+                            Images are processed securely and deleted immediately after analysis
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tachometer-alt fa-2x text-info mb-3"></i>
+                        <h5 class="card-title">Fast Results</h5>
+                        <p class="card-text text-muted">
+                            Get instant fraud detection results with detailed similarity analysis
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    How to Use
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li class="mb-2">Upload a <strong>genuine signature</strong> image (known authentic signature)</li>
+                    <li class="mb-2">Upload a <strong>test signature</strong> image (signature to verify)</li>
+                    <li class="mb-2">Click "Analyze Signatures" to start the verification process</li>
+                    <li>Review the results showing similarity score and authenticity verdict</li>
+                </ol>
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Tip:</strong> For best results, use clear, high-contrast signature images with minimal background noise.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Loading overlay
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+    submitBtn.disabled = true;
+    
+    // Show loading overlay
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
+             style="background: rgba(0,0,0,0.8); z-index: 9999;">
+            <div class="text-center text-white">
+                <div class="spinner-border mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h4>Analyzing Signatures...</h4>
+                <p>Please wait while our AI processes your images</p>
+            </div>
+        </div>
+    `);
+});
+</script>
+{% endblock %}
