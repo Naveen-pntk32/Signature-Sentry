@@ -117,6 +117,32 @@ class SiameseSignatureModel:
         
         return texture_features
     
+    def _calculate_custom_ssim(self, img1, img2):
+        """Calculate a custom structural similarity measure"""
+        try:
+            # Calculate means
+            mu1 = np.mean(img1)
+            mu2 = np.mean(img2)
+            
+            # Calculate variances and covariance
+            sigma1 = np.var(img1)
+            sigma2 = np.var(img2)
+            sigma12 = np.mean((img1 - mu1) * (img2 - mu2))
+            
+            # SSIM formula components
+            c1 = 0.01 ** 2
+            c2 = 0.03 ** 2
+            
+            numerator = (2 * mu1 * mu2 + c1) * (2 * sigma12 + c2)
+            denominator = (mu1**2 + mu2**2 + c1) * (sigma1 + sigma2 + c2)
+            
+            ssim_value = numerator / (denominator + 1e-7)
+            return max(0.0, min(1.0, float(ssim_value)))
+            
+        except Exception as e:
+            logger.error(f"Error calculating custom SSIM: {str(e)}")
+            return 0.5
+    
     def predict_similarity(self, img1, img2):
         """
         Predict similarity between two signature images using multiple metrics
@@ -156,7 +182,7 @@ class SiameseSignatureModel:
             
             # 2. HOG feature similarity
             hog_sim = 1 - cosine(features1['hog'], features2['hog'])
-            similarities['hog'] = max(0, hog_sim)  # Ensure non-negative
+            similarities['hog'] = max(0.0, float(hog_sim))  # Ensure non-negative
             
             # 3. Geometric feature similarity
             contour_sim = self._calculate_geometric_similarity(features1, features2)
@@ -168,13 +194,13 @@ class SiameseSignatureModel:
             
             # 5. Texture similarity
             texture_sim = 1 - cosine(features1['texture'], features2['texture'])
-            similarities['texture'] = max(0, texture_sim)
+            similarities['texture'] = max(0.0, float(texture_sim))
             
             # 6. Pixel-level correlation
             flat1 = img1_2d.flatten()
             flat2 = img2_2d.flatten()
             correlation, _ = pearsonr(flat1, flat2)
-            similarities['correlation'] = max(0, correlation)
+            similarities['correlation'] = max(0.0, float(correlation))
             
             # Weighted combination of all similarities
             weights = {
